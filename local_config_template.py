@@ -1,4 +1,3 @@
-
 """
 Configuration settings for EternaLattice in standalone node mode
 Template version - Copy to local_config.py and customize
@@ -19,7 +18,7 @@ KEY_STORAGE_PATH = os.path.join(DATA_DIR, "keys")
 LOGS_PATH = os.path.join(DATA_DIR, "logs")
 
 # Network configuration
-DEFAULT_PORT = 4444  # Default P2P network port
+DEFAULT_PORT = 5000  # Default P2P network port
 P2P_PROTOCOL = "tcp"
 MAX_PEERS = 50
 HEARTBEAT_INTERVAL = 30  # seconds
@@ -27,8 +26,7 @@ CONNECTION_TIMEOUT = 10  # seconds
 
 # Add your seed peers here
 SEED_PEERS = [
-    # Format: "ip:port"
-    # These would be reliable nodes maintained by the project
+    "76.35.213.14:5000"  # Genesis node
 ]
 
 # Create necessary directories
