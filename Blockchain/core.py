@@ -7,7 +7,7 @@ import logging
 from typing import Dict, List, Tuple, Optional, Any
 import random
 
-from models import Block, MemoryShard
+from .models import Block, MemoryShard
 from blockchain.crypto import generate_hash, verify_hash, sign_data, verify_signature
 from blockchain.consensus import calculate_fitness, evolve_traits, initial_traits
 from blockchain.memory_shard import create_shard, find_shard
