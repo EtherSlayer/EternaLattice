@@ -5,7 +5,7 @@ EternaLattice Standalone Node Main Entry Point
 This script provides a convenient way to run EternaLattice in standalone mode,
 which includes both the node and the web interface.
 """
-import Blockchain
+import blockchain
 import os
 import sys
 import logging
