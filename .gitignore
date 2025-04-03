@@ -155,3 +155,4 @@ cython_debug/
 local_config.py  # Local node configuration
 *.db  # SQLite database files (in case not named db.sqlite3)
 temp/  # Temporary directories
+local_config.py
