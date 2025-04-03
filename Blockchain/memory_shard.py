@@ -8,7 +8,7 @@ import json
 from typing import Dict, Any, List, Optional
 import uuid
 
-from models import MemoryShard
+from .models import MemoryShard
 from blockchain.crypto import generate_hash, sign_data, verify_hash
 import config
 

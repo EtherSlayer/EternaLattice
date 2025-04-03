@@ -10,7 +10,7 @@ from typing import Dict, List, Any, Optional
 import threading
 import uuid
 
-from models import Node, Block, MemoryShard
+from .models import Node, Block, MemoryShard
 from blockchain.crypto import (
     generate_key_pair, sign_data, verify_signature, 
     encrypt_data, decrypt_data

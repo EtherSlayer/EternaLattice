@@ -1,7 +1,8 @@
 """
 EternaLattice blockchain module.
 """
-from blockchain import core, crypto, consensus, memory_shard, network, visualization
+from .models import Block, MemoryShard
+from . import core, crypto, consensus, memory_shard, network, visualization
 
 # Export key functions for easier access
 from blockchain.core import (
