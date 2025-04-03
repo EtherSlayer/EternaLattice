@@ -103,7 +103,7 @@ def create_config_file(data_dir, port):
         # Customize content
         config_content = config_content.replace("DATA_DIR = os.path.join(HOME_DIR, \".eternalattice\")", 
                                               f"DATA_DIR = \"{data_dir}\"")
-        config_content = config_content.replace("DEFAULT_PORT = 4444", 
+        config_content = config_content.replace("DEFAULT_PORT = 5000", 
                                               f"DEFAULT_PORT = {port}")
         
         # Write to user config file
@@ -305,7 +305,7 @@ def main():
     """Main installation function."""
     parser = argparse.ArgumentParser(description="EternaLattice node installation script")
     parser.add_argument("--datadir", help="Data directory path (default: ~/.eternalattice)")
-    parser.add_argument("--port", type=int, default=4444, help="Port for P2P network (default: 4444)")
+    parser.add_argument("--port", type=int, default=5000, help="Port for P2P network (default: 5000)")
     
     args = parser.parse_args()
     
