@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EternaLattice Node Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <style>
+        .stats-card {
+            height: 100%;
+            transition: all 0.2s ease;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .node-info {
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .chart-container {
+            background-color: var(--bs-dark);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .recent-activity {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .logs-container {
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            background-color: var(--bs-dark);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        .logo {
+            max-width: 50px;
+            margin-right: 10px;
+        }
+        .badge-lattice {
+            background-color: var(--bs-info);
+            color: var(--bs-dark);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                    <path fill="var(--bs-info)" d="M32 4L4 32l28 28 28-28L32 4z"/>
+                    <path fill="var(--bs-dark)" d="M32 16L16 32l16 16 16-16L32 16z"/>
+                    <circle fill="var(--bs-info)" cx="32" cy="32" r="4"/>
+                </svg>
+                EternaLattice Node
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/blockchain">Blockchain</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/shards">Memory Shards</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/network">Network</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/leaderboard">Leaderboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile">Profile</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mb-5">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card bg-dark">
+                    <div class="card-body text-center">
+                        <h1 class="card-title">Welcome to your EternaLattice Node</h1>
+                        <p class="text-muted">Preserving knowledge across time and space</p>
+                        <div class="node-info mb-3">
+                            <span class="badge badge-lattice">Node ID: {{ stats.node_id }}</span>
+                            <span class="badge bg-secondary">Uptime: {{ stats.uptime }}</span>
+                            <span class="badge bg-secondary">Last Activity: {{ stats.last_activity }}</span>
+                        </div>
+                        <div class="d-flex justify-content-center gap-3">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#mineBlockModal">
+                                <i class="bi bi-plus-lg"></i> Mine New Block
+                            </button>
+                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addShardModal">
+                                <i class="bi bi-file-earmark-plus"></i> Add Memory Shard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center stats-card bg-dark">
+                    <div class="card-body">
+                        <h5 class="card-title">Blocks</h5>
+                        <h2 class="display-4">{{ stats.block_count }}</h2>
+                        <p class="card-text text-muted">Lattice Points</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center stats-card bg-dark">
+                    <div class="card-body">
+                        <h5 class="card-title">Shards</h5>
+                        <h2 class="display-4">{{ stats.shard_count }}</h2>
+                        <p class="card-text text-muted">Knowledge Fragments</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center stats-card bg-dark">
+                    <div class="card-body">
+                        <h5 class="card-title">Health</h5>
+                        <h2 class="display-4">{{ "%.1f"|format(stats.blockchain_health * 100) }}%</h2>
+                        <p class="card-text text-muted">Lattice Integrity</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center stats-card bg-dark">
+                    <div class="card-body">
+                        <h5 class="card-title">Stability</h5>
+                        <h2 class="display-4">{{ "%.1f"|format(stats.consensus_stability * 100) }}%</h2>
+                        <p class="card-text text-muted">Consensus Strength</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <h3 class="mb-3">Blockchain Visualization</h3>
+                
+                {% if consensus_chart %}
+                <div class="chart-container">
+                    <h5>Consensus Evolution</h5>
+                    <img src="data:image/png;base64,{{ consensus_chart }}" alt="Consensus Evolution Chart" class="img-fluid">
+                </div>
+                {% endif %}
+                
+                {% if fitness_chart %}
+                <div class="chart-container">
+                    <h5>Fitness Landscape</h5>
+                    <img src="data:image/png;base64,{{ fitness_chart }}" alt="Fitness Landscape Chart" class="img-fluid">
+                </div>
+                {% endif %}
+                
+                {% if stats_chart %}
+                <div class="chart-container">
+                    <h5>Blockchain Statistics</h5>
+                    <img src="data:image/png;base64,{{ stats_chart }}" alt="Blockchain Statistics Chart" class="img-fluid">
+                </div>
+                {% endif %}
+                
+                {% if not consensus_chart and not fitness_chart and not stats_chart %}
+                <div class="alert alert-info">
+                    <h5>No Blockchain Data Yet</h5>
+                    <p>Start mining blocks to see visualizations of your blockchain.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="col-md-4">
+                <h3 class="mb-3">Recent Activity</h3>
+                <div class="card bg-dark mb-4">
+                    <div class="card-header">
+                        Recent Memory Shards
+                    </div>
+                    <div class="list-group list-group-flush recent-activity">
+                        {% if recent_shards %}
+                            {% for shard in recent_shards %}
+                            <div class="list-group-item bg-dark">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ shard.category }}</h6>
+                                    <small>{{ format_timestamp(shard.creation_time) }}</small>
+                                </div>
+                                <p class="mb-1">{{ shard.data[:50] }}{% if shard.data|length > 50 %}...{% endif %}</p>
+                                <small>Region: {{ shard.region }}</small>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="list-group-item bg-dark">
+                                <p class="mb-0">No memory shards yet. Start adding knowledge to the network!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card bg-dark mb-4">
+                    <div class="card-header">
+                        Top Contributors
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% if top_users %}
+                            {% for user in top_users %}
+                            <div class="list-group-item bg-dark">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ user.display_name }}</h6>
+                                    <span class="badge bg-info">Level {{ user.level }}</span>
+                                </div>
+                                <p class="mb-1">{{ user.total_points }} points</p>
+                                <small>Blocks: {{ user.mined_blocks }}, Shards: {{ user.created_shards }}</small>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="list-group-item bg-dark">
+                                <p class="mb-0">No users yet. Start contributing to see your rank!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <h3 class="mb-3">Node Logs</h3>
+                <div class="logs-container">
+                    {% for log in logs %}
+                        <div>{{ log }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mine Block Modal -->
+    <div class="modal fade" id="mineBlockModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark">
+                <div class="modal-header">
+                    <h5 class="modal-title">Mine a New Block</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="mineBlockForm">
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="coordinateType" id="autoCoordinates" value="auto" checked>
+                                <label class="form-check-label" for="autoCoordinates">
+                                    Automatic Coordinates (Recommended)
+                                </label>
+                                <small class="form-text text-muted d-block">
+                                    Let the algorithm find the optimal position in the lattice.
+                                </small>
+                            </div>
+                            <div class="form-check mt-3">
+                                <input class="form-check-input" type="radio" name="coordinateType" id="manualCoordinates" value="manual">
+                                <label class="form-check-label" for="manualCoordinates">
+                                    Manual Coordinates
+                                </label>
+                                <small class="form-text text-muted d-block">
+                                    Specify exact lattice coordinates.
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div id="coordinatesContainer" class="d-none">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="mb-3">
+                                        <label for="xCoord" class="form-label">X Coordinate (Time)</label>
+                                        <input type="number" class="form-control" id="xCoord" name="x" value="1">
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="mb-3">
+                                        <label for="yCoord" class="form-label">Y Coordinate (Category)</label>
+                                        <input type="number" class="form-control" id="yCoord" name="y" value="0">
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="mb-3">
+                                        <label for="zCoord" class="form-label">Z Coordinate (Region)</label>
+                                        <input type="number" class="form-control" id="zCoord" name="z" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Mining a block requires computational work and helps secure the knowledge in the network.
+                        </div>
+                    </form>
+                    <div id="miningStatus" class="d-none">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary mb-3" role="status">
+                                <span class="visually-hidden">Mining...</span>
+                            </div>
+                            <p>Mining a new block... Please wait.</p>
+                        </div>
+                    </div>
+                    <div id="miningResult" class="d-none">
+                        <div class="alert alert-success">
+                            <h5>Block Successfully Mined!</h5>
+                            <p id="miningResultDetails"></p>
+                        </div>
+                    </div>
+                    <div id="miningError" class="d-none">
+                        <div class="alert alert-danger">
+                            <h5>Mining Failed</h5>
+                            <p id="miningErrorDetails"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="startMiningBtn">Start Mining</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Shard Modal -->
+    <div class="modal fade" id="addShardModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add a New Memory Shard</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addShardForm">
+                        <div class="mb-3">
+                            <label for="shardData" class="form-label">Knowledge Content</label>
+                            <textarea class="form-control" id="shardData" name="data" rows="5" required placeholder="Enter the knowledge you want to preserve..."></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="shardCategory" class="form-label">Category</label>
+                                    <select class="form-select" id="shardCategory" name="category">
+                                        <option value="science">Science</option>
+                                        <option value="history">History</option>
+                                        <option value="culture">Culture</option>
+                                        <option value="technology">Technology</option>
+                                        <option value="philosophy">Philosophy</option>
+                                        <option value="art">Art</option>
+                                        <option value="literature">Literature</option>
+                                        <option value="general" selected>General</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="shardRegion" class="form-label">Region</label>
+                                    <select class="form-select" id="shardRegion" name="region">
+                                        <option value="africa">Africa</option>
+                                        <option value="asia">Asia</option>
+                                        <option value="europe">Europe</option>
+                                        <option value="north_america">North America</option>
+                                        <option value="south_america">South America</option>
+                                        <option value="oceania">Oceania</option>
+                                        <option value="global" selected>Global</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="shardTags" class="form-label">Tags</label>
+                            <input type="text" class="form-control" id="shardTags" name="tags" placeholder="comma, separated, tags">
+                            <small class="form-text text-muted">Optional: Add tags to help with searchability.</small>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Memory Shards are fragments of knowledge preserved in the EternaLattice network. They are immutable once created.
+                        </div>
+                    </form>
+                    <div id="addingStatus" class="d-none">
+                        <div class="text-center">
+                            <div class="spinner-border text-success mb-3" role="status">
+                                <span class="visually-hidden">Adding...</span>
+                            </div>
+                            <p>Adding memory shard to the network... Please wait.</p>
+                        </div>
+                    </div>
+                    <div id="addingResult" class="d-none">
+                        <div class="alert alert-success">
+                            <h5>Memory Shard Successfully Added!</h5>
+                            <p id="addingResultDetails"></p>
+                        </div>
+                    </div>
+                    <div id="addingError" class="d-none">
+                        <div class="alert alert-danger">
+                            <h5>Failed to Add Memory Shard</h5>
+                            <p id="addingErrorDetails"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" id="addShardBtn">Add to Network</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-auto py-3 bg-dark">
+        <div class="container text-center">
+            <span class="text-muted">EternaLattice Node v1.0 | Preserving Human Knowledge for Eternity</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle coordinates container based on selection
+            document.querySelectorAll('input[name="coordinateType"]').forEach(input => {
+                input.addEventListener('change', function() {
+                    const coordsContainer = document.getElementById('coordinatesContainer');
+                    if (this.value === 'manual') {
+                        coordsContainer.classList.remove('d-none');
+                    } else {
+                        coordsContainer.classList.add('d-none');
+                    }
+                });
+            });
+            
+            // Mine Block Form Submission
+            document.getElementById('startMiningBtn').addEventListener('click', function() {
+                const form = document.getElementById('mineBlockForm');
+                const miningStatus = document.getElementById('miningStatus');
+                const miningResult = document.getElementById('miningResult');
+                const miningError = document.getElementById('miningError');
+                const coordType = document.querySelector('input[name="coordinateType"]:checked').value;
+                
+                // Hide previous results/errors
+                miningResult.classList.add('d-none');
+                miningError.classList.add('d-none');
+                
+                // Show mining status
+                form.classList.add('d-none');
+                miningStatus.classList.remove('d-none');
+                document.getElementById('startMiningBtn').disabled = true;
+                
+                // Prepare form data
+                const formData = new FormData();
+                
+                if (coordType === 'manual') {
+                    formData.append('x', document.getElementById('xCoord').value);
+                    formData.append('y', document.getElementById('yCoord').value);
+                    formData.append('z', document.getElementById('zCoord').value);
+                    formData.append('auto', 'false');
+                } else {
+                    formData.append('auto', 'true');
+                }
+                
+                // Submit API request
+                fetch('/api/mine_block', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    miningStatus.classList.add('d-none');
+                    
+                    if (data.success) {
+                        document.getElementById('miningResultDetails').textContent = data.message;
+                        miningResult.classList.remove('d-none');
+                        // Auto-refresh the page after successful mining
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 3000);
+                    } else {
+                        document.getElementById('miningErrorDetails').textContent = data.message;
+                        miningError.classList.remove('d-none');
+                        form.classList.remove('d-none');
+                        document.getElementById('startMiningBtn').disabled = false;
+                    }
+                })
+                .catch(error => {
+                    miningStatus.classList.add('d-none');
+                    document.getElementById('miningErrorDetails').textContent = 'Network error occurred. Please try again.';
+                    miningError.classList.remove('d-none');
+                    form.classList.remove('d-none');
+                    document.getElementById('startMiningBtn').disabled = false;
+                });
+            });
+            
+            // Add Shard Form Submission
+            document.getElementById('addShardBtn').addEventListener('click', function() {
+                const form = document.getElementById('addShardForm');
+                const addingStatus = document.getElementById('addingStatus');
+                const addingResult = document.getElementById('addingResult');
+                const addingError = document.getElementById('addingError');
+                
+                // Validate form
+                const shardData = document.getElementById('shardData').value.trim();
+                if (!shardData) {
+                    document.getElementById('addingErrorDetails').textContent = 'Knowledge content cannot be empty.';
+                    addingError.classList.remove('d-none');
+                    return;
+                }
+                
+                // Hide previous results/errors and show status
+                addingResult.classList.add('d-none');
+                addingError.classList.add('d-none');
+                form.classList.add('d-none');
+                addingStatus.classList.remove('d-none');
+                document.getElementById('addShardBtn').disabled = true;
+                
+                // Prepare form data
+                const formData = new FormData(form);
+                
+                // Submit API request
+                fetch('/api/add_shard', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    addingStatus.classList.add('d-none');
+                    
+                    if (data.success) {
+                        document.getElementById('addingResultDetails').textContent = data.message;
+                        addingResult.classList.remove('d-none');
+                        // Auto-refresh the page after successful adding
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 3000);
+                    } else {
+                        document.getElementById('addingErrorDetails').textContent = data.message;
+                        addingError.classList.remove('d-none');
+                        form.classList.remove('d-none');
+                        document.getElementById('addShardBtn').disabled = false;
+                    }
+                })
+                .catch(error => {
+                    addingStatus.classList.add('d-none');
+                    document.getElementById('addingErrorDetails').textContent = 'Network error occurred. Please try again.';
+                    addingError.classList.remove('d-none');
+                    form.classList.remove('d-none');
+                    document.getElementById('addShardBtn').disabled = false;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
